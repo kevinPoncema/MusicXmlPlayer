@@ -10,11 +10,19 @@ Una herramienta por consola desarrollada en **C# (.NET)** diseñada para analiza
 - 🎚️ **Control de Volumen Dinámico:** Puedes configurar la amplificación (0.0 a 1.0) desde la línea de comandos.
 - 🎨 **Generador Gráfico de Partituras:** Utilizando el flag `--image`, dibuja visualmente un archivo `.png` perfecto de tu XML integrándose con la interfaz de consola de **MuseScore** (`mscore`).
 
-## Requisitos
+## Requisitos e Instalación
 
-- [.NET SDK](https://dotnet.microsoft.com/download) (versión 10.0+).
-- SO Linux con `aplay` (ALSA) instalado.
-- Dependencia opcional para generar imágenes (`--image`): `sudo apt install musescore3`
+Para que el programa pueda emitir sonido y generar partituras, necesitas tener las siguientes dependencias instaladas en tu distribución Linux (comandos para Ubuntu/Debian):
+
+1. **.NET SDK** (versión 10.0+): Para compilar y correr el código C#.
+2. **ALSA (`aplay`)**: Por lo general viene instalado por defecto en Ubuntu.
+3. **MuseScore 3**: Necesario *únicamente* si deseas usar el parámetro `--image` para dibujar las partituras.
+
+Puedes asegurarte de tener todo instalado corriendo:
+```bash
+sudo apt update
+sudo apt install alsa-utils musescore3
+```
 
 ## Uso y Ejecución
 
