@@ -13,19 +13,8 @@ public class MusicEngraverService
         
         try
         {
-            bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             string fileName = "mscore";
             string arguments = $"-o \"{outputImagePath}\" \"{inputXmlPath}\"";
-
-            // Si detectamos que estamos en Docker, usamos xvfb-run
-            // ya que MuseScore requiere un entorno gráfico X11 simulado.
-            bool isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-            
-            if (isLinux && isDocker)
-            {
-                fileName = "xvfb-run";
-                arguments = $"-a mscore -o \"{outputImagePath}\" \"{inputXmlPath}\"";
-            }
 
             var psi = new ProcessStartInfo
             {
