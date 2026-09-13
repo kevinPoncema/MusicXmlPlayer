@@ -4,12 +4,13 @@ using System.Globalization;
 using MusicXmlPlayer.Services;
 
 Console.WriteLine("=== MusicXML Player ===");
-
-string filePath = args.Length > 0 ? args[0] : "sample.musicxml";
+const int filePathIndex = 0;
+const int volumeIndex = 1;
+string filePath = args.Length > filePathIndex ? args[filePathIndex] : "sample.musicxml";
 
 // Parsear volumen del segundo argumento (si existe)
 double volume = 0.2;
-if (args.Length > 1)
+if (args.Length > volumeIndex)
 {
     if (!double.TryParse(args[1], NumberStyles.Any, CultureInfo.InvariantCulture, out volume))
     {
