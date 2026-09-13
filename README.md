@@ -1,43 +1,63 @@
-# MusicXML Player
+# MusicXML Player & Engraver
 
-Un reproductor por consola desarrollado en **C# (.NET)** diseñado para analizar y reproducir archivos en formato estándar **MusicXML**. Este proyecto fue creado con una filosofía de compatibilidad pura en entornos Linux (específicamente Ubuntu), utilizando la librería **NAudio** para sintetizar audio y `aplay` para reproducirlo sin dependencias gráficas de Windows.
+Una herramienta por consola desarrollada en **C# (.NET)** diseñada para analizar, reproducir y renderizar gráficamente archivos en formato estándar **MusicXML**. Este proyecto está construido con una filosofía de compatibilidad pura, soportando entornos Linux (como Ubuntu) nativamente e integrado opcionalmente en contenedores Docker. 
 
 ## Características Principales
 
 - 🎼 **Parseador Nativo:** Lee etiquetas estándar de archivos `.musicxml` (Notas, Silencios, Compases, BPM).
-- 🏷️ **Metadatos:** Extrae e imprime en pantalla el Título, Compositor, Derechos de Autor y el Software utilizado para crear la partitura.
-- 🔊 **Síntesis de Audio (Cross-Platform):** Genera dinámicamente frecuencias sinusoidales precisas según las notas del MusicXML utilizando los generadores de `NAudio`.
-- 🐧 **Soporte Nativo Linux:** Evita el uso de APIs privativas de Windows (como `WaveOut`), utilizando en su lugar un motor de renderizado a `.wav` para delegar la salida de sonido directamente a `aplay` (ALSA).
-- 🎚️ **Control de Volumen Dinámico:** Puedes controlar la amplificación (ganancia) directamente desde el terminal.
+- 🏷️ **Metadatos:** Extrae e imprime en pantalla el Título, Compositor, Derechos de Autor y el Software original de la partitura.
+- 🔊 **Síntesis de Audio (Cross-Platform):** Genera frecuencias precisas vía `NAudio` (SignalGenerators) y reproduce el audio usando `aplay` (ALSA) para evadir las dependencias exclusivas de Windows como `WaveOut`.
+- 🎚️ **Control de Volumen Dinámico:** Puedes configurar la amplificación (0.0 a 1.0) desde la línea de comandos.
+- 🎨 **Generador Gráfico de Partituras:** Utilizando el flag `--image`, dibuja visualmente un archivo `.png` perfecto de tu XML, integrándose *headless* con la interfaz de consola de **MuseScore** (`mscore` / `xvfb-run`).
+- 🐳 **Dockerización Universal:** Listo para ejecutarse de principio a fin en cualquier sistema vía Docker, inyectando el hardware de sonido local.
 
-## Requisitos Previos
+## Requisitos (Uso Local)
 
-- [.NET SDK](https://dotnet.microsoft.com/download) (versión 10.0 o superior recomendada).
-- SO Linux (probado en Ubuntu) con el comando `aplay` disponible (viene por defecto con ALSA).
+Si prefieres correrlo en tu máquina host sin Docker:
+- [.NET SDK](https://dotnet.microsoft.com/download) (versión 10.0+).
+- SO Linux con `aplay` (ALSA) instalado.
+- Dependencias opcionales para usar `--image`: `sudo apt install musescore3 xvfb`
 
 ## Uso y Ejecución
 
-Puedes reproducir cualquier archivo `.musicxml`. Si no pasas argumentos, el programa buscará por defecto un archivo llamado `sample.musicxml`.
+Si no pasas un archivo, por defecto buscará y ejecutará `sample.musicxml`. Los parámetros admitidos incluyen un archivo, un volumen decimal y el flag `--image` en cualquier orden válido.
 
 ```bash
-# Reproducir el archivo de muestra (Estrellita Dónde Estás)
+# 1. Reproducción básica
 dotnet run
 
-# Reproducir un archivo específico
+# 2. Reproducir un archivo específico
 dotnet run tu_archivo.musicxml
 
-# Reproducir un archivo específico con volumen ajustable (0.0 a 1.0)
-dotnet run tu_archivo.musicxml 0.5
+# 3. Reproducir con ajuste de volumen (ej: 80%)
+dotnet run tu_archivo.musicxml 0.8
+
+# 4. Reproducir con volumen Y generar partitura en formato PNG
+dotnet run tu_archivo.musicxml 0.8 --image
 ```
+
+## Ejecución Mediante Docker
+
+Para evitar ensuciar tu sistema operativo instalando MuseScore o .NET, puedes delegarle todo el trabajo al contenedor.
+
+1. **Construir la imagen** (sólo la primera vez):
+   ```bash
+   docker build -t music-xml-player .
+   ```
+
+2. **Correr la aplicación** (con sonido e imágenes):
+   > ⚠️ **Nota:** Para que el contenedor pueda reproducir sonido en tus audífonos/parlantes físicos, es estrictamente necesario mapear la tarjeta de sonido de tu sistema host hacia dentro de Docker utilizando el parámetro `--device /dev/snd`.
+
+   ```bash
+   docker run --device /dev/snd music-xml-player sample.musicxml 0.8 --image
+   ```
 
 ## Estructura del Proyecto
 
-- `Models/`: Clases de dominio como `SongScore`, `Measure`, `NoteItem` y `RestItem`.
+- `Models/`: Modelos del dominio (`SongScore`, `Measure`, `NoteItem`, `RestItem`).
 - `Services/`:
-  - `MusicXmlParser`: Analiza el DOM del XML para convertirlo en objetos tipados.
-  - `MusicPlayerService`: Procesa la lista de `IPlayable`, genera los osciladores y acciona el reproductor.
-- `Program.cs`: Punto de entrada del programa, inyector de dependencias rudimentario y capa visual de la CLI.
-
-## Autor
-
-Proyecto personal desarrollado en C#.
+  - `MusicXmlParser`: Convierte los nodos XML a objetos tipados.
+  - `MusicPlayerService`: Procesa cronológicamente la música y la emite hacia ALSA.
+  - `MusicEngraverService`: Administra los procesos de MuseScore para renderizar partituras visuales.
+- `Program.cs`: Punto de entrada CLI, parser de argumentos y orquestador.
+- `Dockerfile`: Receta multi-stage que automatiza el empaquetado de MuseScore, XVFB y ALSA.
