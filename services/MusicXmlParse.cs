@@ -44,6 +44,25 @@ public class MusicXmlParser
             score.Title = titleNode.Value;
         }
 
+        var creatorNodes = doc.Descendants("creator");
+        var composerNode = creatorNodes.FirstOrDefault(c => c.Attribute("type")?.Value == "composer") ?? creatorNodes.FirstOrDefault();
+        if (composerNode != null)
+        {
+            score.Composer = composerNode.Value;
+        }
+
+        var rightsNode = doc.Descendants("rights").FirstOrDefault();
+        if (rightsNode != null)
+        {
+            score.Rights = rightsNode.Value;
+        }
+
+        var softwareNode = doc.Descendants("software").FirstOrDefault();
+        if (softwareNode != null)
+        {
+            score.Encoder = softwareNode.Value;
+        }
+
         var part = doc.Descendants("part").FirstOrDefault();
         if (part == null) return score;
 
