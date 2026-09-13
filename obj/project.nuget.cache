@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "HweNQupaDSk=",
+  "success": true,
+  "projectFilePath": "/home/kevin/Documentos/personal/c#/ MusicXmlPlayer/MusicXmlPlayer.csproj",
+  "expectedPackageFiles": [
+    "/home/kevin/.nuget/packages/naudio/3.1.0/naudio.3.1.0.nupkg.sha512",
+    "/home/kevin/.nuget/packages/naudio.core/3.1.0/naudio.core.3.1.0.nupkg.sha512",
+    "/home/kevin/.nuget/packages/naudio.midi/3.1.0/naudio.midi.3.1.0.nupkg.sha512",
+    "/home/kevin/.nuget/packages/system.numerics.tensors/9.0.0/system.numerics.tensors.9.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
