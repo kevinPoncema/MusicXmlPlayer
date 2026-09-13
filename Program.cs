@@ -1,27 +1,32 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Globalization;
 using MusicXmlPlayer.Services;
 
-Console.WriteLine("=== MusicXML Player ===");
-const int filePathIndex = 0;
-const int volumeIndex = 1;
-string filePath = args.Length > filePathIndex ? args[filePathIndex] : "sample.musicxml";
+Console.WriteLine("=== MusicXML Player & Engraver ===");
 
-// Parsear volumen del segundo argumento (si existe)
+const int FilePathArgIndex = 0;
+const int VolumeArgIndex = 1;
+
+bool generateImage = args.Contains("--image");
+var cleanArgs = args.Where(a => a != "--image").ToArray();
+
+string filePath = cleanArgs.Length > FilePathArgIndex ? cleanArgs[FilePathArgIndex] : "sample.musicxml";
+
 double volume = 0.2;
-if (args.Length > volumeIndex)
+if (cleanArgs.Length > VolumeArgIndex)
 {
-    if (!double.TryParse(args[1], NumberStyles.Any, CultureInfo.InvariantCulture, out volume))
+    if (!double.TryParse(cleanArgs[VolumeArgIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out volume))
     {
-        Console.WriteLine($"Advertencia: '{args[1]}' no es un volumen válido. Usando {volume} por defecto.");
+        Console.WriteLine($"Advertencia: '{cleanArgs[VolumeArgIndex]}' no es un volumen válido. Usando {volume} por defecto.");
     }
 }
 
 if (!File.Exists(filePath))
 {
     Console.WriteLine($"Error: No se encontró el archivo '{filePath}'.");
-    Console.WriteLine("Uso: dotnet run <archivo.musicxml> [volumen(0.0 - 1.0)]");
+    Console.WriteLine("Uso: dotnet run <archivo.musicxml> [volumen(0.0 - 1.0)] [--image]");
     return;
 }
 
@@ -40,6 +45,13 @@ Console.WriteLine($"Tempo     : {score.TempoBpm} BPM");
 Console.WriteLine("---------------------------------\n");
 
 Console.WriteLine($"Se extrajeron {timeline.Count} elementos (notas/silencios).");
+
+if (generateImage)
+{
+    var engraver = new MusicEngraverService();
+    string outputImg = Path.ChangeExtension(filePath, ".png");
+    engraver.GenerateImage(filePath, outputImg);
+}
 
 var player = new MusicPlayerService();
 Console.WriteLine($"Reproduciendo con volumen a {volume * 100}%...");
